@@ -46,6 +46,7 @@ until [[ ${status} != "PENDING" && ${status} != "IN_PROGRESS" ]]; do
 done
 printf '\n'
 echo "saiu do while"
+echo "task $task"
 
 analysisId="$(jq -r '.task.analysisId' <<< "${task}")"
 echo "Analysis ID: $analysisId"
