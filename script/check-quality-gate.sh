@@ -35,6 +35,7 @@ if [[ -n "${SONAR_ROOT_CERT}" ]]; then
 fi
 
 task="$(curl --location --location-trusted --max-redirs 10  --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
+echo "task $task"
 status="$(jq -r '.task.status' <<< "$task")"
 echo $status
 
