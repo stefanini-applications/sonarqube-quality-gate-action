@@ -36,6 +36,7 @@ fi
 
 task="$(curl --location --location-trusted --max-redirs 10  --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
 status="$(jq -r '.task.status' <<< "$task")"
+echo $status
 
 until [[ ${status} != "PENDING" && ${status} != "IN_PROGRESS" ]]; do
     printf '.'
@@ -44,13 +45,19 @@ until [[ ${status} != "PENDING" && ${status} != "IN_PROGRESS" ]]; do
     status="$(jq -r '.task.status' <<< "$task")"
 done
 printf '\n'
+echo "saiu do while"
 
 analysisId="$(jq -r '.task.analysisId' <<< "${task}")"
+echo "Analysis ID: $analysisId"
 qualityGateUrl="${serverUrl}/api/qualitygates/project_status?analysisId=${analysisId}"
+echo "qualityGateUrl: $qualityGateUrl"
 qualityGateStatus="$(curl --location --location-trusted --max-redirs 10 --silent --fail --show-error --user "${SONAR_TOKEN}": "${qualityGateUrl}" | jq -r '.projectStatus.status')"
+echo "qualityGateStatus: $qualityGateStatus"
 
 dashboardUrl="$(sed -n 's/dashboardUrl=\(.*\)/\1/p' "${metadataFile}")"
+echo "dashboardUrl: $dashboardUrl"
 analysisResultMsg="Detailed information can be found at: ${dashboardUrl}\n"
+
 
 if [[ ${qualityGateStatus} == "OK" ]]; then
    set_output "quality-gate-status" "PASSED"
