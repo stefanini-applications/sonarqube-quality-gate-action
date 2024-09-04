@@ -34,16 +34,19 @@ if [[ -n "${SONAR_ROOT_CERT}" ]]; then
   echo "--cacert /tmp/tmpcert.pem" >> ~/.curlrc
 fi
 
+## MAX_ATTEMPTS=50
+MAX_ATTEMPTS=60
 task="$(curl --location --location-trusted --max-redirs 10  --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
 echo "task $task"
 status="$(jq -r '.task.status' <<< "$task")"
 echo $status
 
-until [[ ${status} != "PENDING" && ${status} != "IN_PROGRESS" ]]; do
+until [[ ${status} != "PENDING" && ${status} != "IN_PROGRESS" || [[ $attempt -ge $MAX_ATTEMPTS ]]; do
     printf '.'
-    sleep 5
+    sleep 10
     task="$(curl --location --location-trusted --max-redirs 10 --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
     status="$(jq -r '.task.status' <<< "$task")"
+    attempt=$((attempt + 1))
 done
 printf '\n'
 echo "saiu do while"
