@@ -35,7 +35,7 @@ if [[ -n "${SONAR_ROOT_CERT}" ]]; then
 fi
 
 ## MAX_ATTEMPTS=60
-MAX_ATTEMPTS=70
+MAX_ATTEMPTS=120
 attempt=0
 
 task="$(curl --location --location-trusted --max-redirs 10  --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
@@ -45,7 +45,7 @@ echo $status
 
 until [[ "${status}" != "PENDING" && "${status}" != "IN_PROGRESS" ]] || [[ $attempt -ge $MAX_ATTEMPTS ]]; do
     printf '.'
-    sleep 15
+    sleep 10
     task="$(curl --location --location-trusted --max-redirs 10 --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
     status="$(jq -r '.task.status' <<< "$task")"
     attempt=$((attempt + 1))
