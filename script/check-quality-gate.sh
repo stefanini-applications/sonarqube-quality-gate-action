@@ -34,9 +34,8 @@ if [[ -n "${SONAR_ROOT_CERT}" ]]; then
   echo "--cacert /tmp/tmpcert.pem" >> ~/.curlrc
 fi
 
-## MAX_ATTEMPTS=60
-MAX_ATTEMPTS=120
 attempt=0
+MAX_ATTEMPTS=100
 
 task="$(curl --location --location-trusted --max-redirs 10  --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
 echo "task $task"
@@ -48,6 +47,8 @@ until [[ "${status}" != "PENDING" && "${status}" != "IN_PROGRESS" ]] || [[ $atte
     sleep 10
     task="$(curl --location --location-trusted --max-redirs 10 --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
     status="$(jq -r '.task.status' <<< "$task")"
+    # debug log
+    echo "Attempt $attempt: status $status" 
     attempt=$((attempt + 1))
 done
 printf '\n'
